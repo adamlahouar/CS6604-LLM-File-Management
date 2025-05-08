@@ -14,6 +14,13 @@
 
 4. Pull the Phi-3 model: `ollama run phi3:3.8b-mini-128k-instruct-q4_K_M`
 5. Install Python dependencies: `pip install -r requirements.txt`
+6. (Optional) If you want to run the categorization evaluation, you'll need to download the 'Web Search' dataset:
+   `python eval/get_web_search_dataset.py`
+
+> **Note:**
+> The categorization evaluation can only be run on the 'Web Search' dataset, as the 'Downloads Folder' dataset is not
+> provided due to privacy concerns. You can still run the evaluation on the 'Web Search' dataset to test the
+> categorization feature's functionality.
 
 ### Usage:
 

@@ -15,12 +15,13 @@ MAX_CHUNK_SIZE = 300
 
 
 def main():
-    print("\n--- Evaluating Downloads folder dataset ---")
-    _evaluate_dataset(
-        metadata_folder='downloads_folder_dataset',
-        labels_file='DOWNLOADS_FOLDER_DATASET_MANUALLY_LABELED.csv',
-        label="Downloads"
-    )
+    # NOTE: Commented out since the 'Downloads Folder' dataset is not included in the repository
+    # print("\n--- Evaluating Downloads folder dataset ---")
+    # _evaluate_dataset(
+    #     metadata_folder='downloads_folder_dataset',
+    #     labels_file='DOWNLOADS_FOLDER_DATASET_MANUALLY_LABELED.csv',
+    #     label="Downloads"
+    # )
 
     print("\n--- Evaluating web_search_dataset folder ---")
     _evaluate_dataset(
