@@ -29,7 +29,6 @@
 
 - To run the UI: `streamlit run ui/ui.py`
 - To run the categorization evaluation: `python eval/categorization_evaluation.py`
-- To run the deletion evaluation: `python eval/deletion_evaluation.py`
 
 ### Contact:
 
