@@ -1,5 +1,3 @@
-import json
-
 import os
 
 import PyPDF2
@@ -10,16 +8,12 @@ from tqdm import tqdm
 
 tqdm.pandas()
 
-DATASET_PATH = 'web_search_dataset.json'
+DATASET_PATH = 'WEB_SEARCH_DATASET_MANUALLY_LABELED.csv'
 DATASET_FOLDER_PATH = 'web_search_dataset'
 
 
 def main():
-    with open(DATASET_PATH, 'r') as f:
-        web_search_dataset = json.load(f)
-
-    df = pd.DataFrame(web_search_dataset).drop('id', axis=1)
-    df = df[df['Filename'].str.endswith('.pdf')]
+    df = pd.read_csv(DATASET_PATH)
 
     if not os.path.exists(DATASET_FOLDER_PATH):
         os.mkdir(DATASET_FOLDER_PATH)
@@ -51,6 +45,9 @@ def _download_file(row):
 
 def _check_corrupted_file(row):
     path = f'{DATASET_FOLDER_PATH}/{row["Filename"]}'
+
+    if not os.path.exists(path):
+        return
 
     try:
         with open(path, 'rb') as f:

@@ -11,6 +11,32 @@ import file_interaction
 DOWNLOADS_PATH = os.path.expanduser("~\\Downloads")
 
 
+def _stream_callback_factory():
+    if "last_thinking" not in st.session_state:
+        st.session_state.last_thinking = ""
+    if "last_response" not in st.session_state:
+        st.session_state.last_response = ""
+
+    think_box = st.empty()
+    response_box = st.empty()
+
+    def callback(text):
+        if "</think>" not in text:
+            clean_text = text.replace("<think>", "")
+            st.session_state.last_thinking = clean_text
+            with think_box.expander("### Thinking...", expanded=True):
+                st.markdown(
+                    f"<div style='color: gray; font-size: 0.9em;'>{clean_text}</div>",
+                    unsafe_allow_html=True
+                )
+        else:
+            response_text = text.split("</think>")[-1]
+            st.session_state.last_response = response_text
+            response_box.markdown("### Response\n" + response_text)
+
+    return callback
+
+
 class LLMFileOrganizer:
     def __init__(self):
         self.df = st.session_state.get("df", metadata.get_files_metadata(DOWNLOADS_PATH))
@@ -29,31 +55,6 @@ class LLMFileOrganizer:
     def _overview(self):
         st.write("This table shows all files in your Downloads folder with metadata.")
         st.dataframe(self.df[['Filename', 'Type', 'Size', 'Last Modified']])
-
-    def _stream_callback_factory(self):
-        if "last_thinking" not in st.session_state:
-            st.session_state.last_thinking = ""
-        if "last_response" not in st.session_state:
-            st.session_state.last_response = ""
-
-        think_box = st.empty()
-        response_box = st.empty()
-
-        def callback(text):
-            if "</think>" not in text:
-                clean_text = text.replace("<think>", "")
-                st.session_state.last_thinking = clean_text
-                with think_box.expander("### Thinking...", expanded=True):
-                    st.markdown(
-                        f"<div style='color: gray; font-size: 0.9em;'>{clean_text}</div>",
-                        unsafe_allow_html=True
-                    )
-            else:
-                response_text = text.split("</think>")[-1]
-                st.session_state.last_response = response_text
-                response_box.markdown("### Response\n" + response_text)
-
-        return callback
 
     def _categorize(self):
         st.write("Use the LLM to categorize files into directories.")
@@ -79,7 +80,7 @@ class LLMFileOrganizer:
                 progress_text.markdown(f"Generating file keywords: **{i}/{total}**")
                 progress_bar.progress(i / total)
 
-            callback = self._stream_callback_factory()
+            callback = _stream_callback_factory()
             categorized_df = categorize.categorize(
                 self.df,
                 user_categories=user_categories,
@@ -179,7 +180,7 @@ class LLMFileOrganizer:
 
         if st.session_state.get_suggestions_flag:
             with st.spinner("Analyzing metadata..."):
-                callback = self._stream_callback_factory()
+                callback = _stream_callback_factory()
                 suggestions_df = suggest_deletions.suggest_deletions(self.df, max_age_days, max_size_kb,
                                                                      stream_callback=callback)
                 suggestions_df = suggestions_df[suggestions_df['LLM-Delete'] == 'Delete']
@@ -208,7 +209,7 @@ class LLMFileOrganizer:
 
             if st.session_state.search_triggered:
                 with st.spinner("Searching files..."):
-                    callback = self._stream_callback_factory()
+                    callback = _stream_callback_factory()
                     results = search.search(self.df,
                                             st.session_state.search_query,
                                             st.session_state.max_num_results,
